@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWC V1 – Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0d0d0d;
+      min-height: 100vh;
+      color: #e5e7eb;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: #141414;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-logo { width: 36px; height: 36px; border-radius: 50%; }
+    .topbar-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: 0.06em; }
+    .topbar-subtitle { font-size: 0.65rem; color: #6b7280; letter-spacing: 0.15em; text-transform: uppercase; }
+    .topbar-badge {
+      background: #c8202a; color: #fff;
+      font-size: 0.65rem; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── LAYOUT ── */
+    .main { padding: 28px 24px; max-width: 1100px; margin: 0 auto; }
+
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .stat-label { font-size: 0.7rem; color: #6b7280; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: #fff; }
+    .stat-sub { font-size: 0.7rem; color: #4b5563; margin-top: 4px; }
+    .stat-card.red .stat-value { color: #e8283a; }
+    .stat-card.blue .stat-value { color: #4db8ff; }
+    .stat-card.green .stat-value { color: #34d399; }
+
+    /* ── SEARCH & CONTROLS ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 0.85rem; color: #6b7280; pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      padding: 9px 12px 9px 34px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: #c8202a; }
+    .search-input::placeholder { color: #4b5563; }
+
+    .btn-refresh {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 9px 16px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color 0.2s;
+      white-space: nowrap;
+    }
+    .btn-refresh:hover { border-color: #c8202a; color: #e8283a; }
+
+    .btn-export {
+      background: linear-gradient(135deg, #e8283a, #a81020);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 9px 16px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+    .btn-export:hover { opacity: 0.85; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-title { font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.06em; text-transform: uppercase; }
+    .table-count { font-size: 0.75rem; color: #6b7280; }
+
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 500px; }
+    thead tr { background: #1e1e1e; }
+    th {
+      text-align: left;
+      font-size: 0.7rem; font-weight: 700;
+      color: #6b7280; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 12px 16px;
+      border-bottom: 1px solid #2a2a2a;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid #1e1e1e;
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #1e1e1e; }
+    td {
+      padding: 13px 16px;
+      font-size: 0.82rem;
+      color: #d1d5db;
+      vertical-align: middle;
+    }
+    .td-num { color: #4b5563; font-size: 0.75rem; }
+    .td-fb { color: #fff; font-weight: 600; }
+    .td-email { color: #4db8ff; }
+    .td-phone { color: #34d399; font-family: monospace; font-size: 0.85rem; }
+    .td-date { color: #6b7280; font-size: 0.75rem; }
+
+    /* ── EMPTY / LOADING STATES ── */
+    .state-row td {
+      text-align: center;
+      padding: 48px 16px;
+      color: #4b5563;
+      font-size: 0.85rem;
+    }
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2px solid #2a2a2a;
+      border-top-color: #c8202a;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    .footer { text-align: center; padding: 24px; font-size: 0.7rem; color: #374151; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .main { padding: 16px 12px; }
+      .topbar { padding: 12px 16px; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .btn-refresh, .btn-export { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <img src="https://i.imgur.com/3cmYibA.png" alt="Logo" class="topbar-logo">
+    <div>
+      <div class="topbar-title">SWC V1</div>
+      <div class="topbar-subtitle">Admin Dashboard</div>
+    </div>
+  </div>
+  <span class="topbar-badge">🔴 Live</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card red">
+      <div class="stat-label">Total Sign Ups</div>
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-sub">All time registrations</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Today</div>
+      <div class="stat-value" id="stat-today">—</div>
+      <div class="stat-sub">Registered today</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">This Week</div>
+      <div class="stat-value" id="stat-week">—</div>
+      <div class="stat-sub">Last 7 days</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" class="search-input" placeholder="Search by name, email, or phone…">
+    </div>
+    <button class="btn-refresh" onclick="loadData()">⟳ Refresh</button>
+    <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <span class="table-title">📋 Registrations</span>
+      <span class="table-count" id="table-count">Loading…</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Facebook Name</th>
+            <th>Username</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Date / Time</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr class="state-row">
+            <td colspan="5">
+              <div class="spinner"></div><br>Loading registrations…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">SWC V1 Admin Dashboard · Data sourced from Google Sheets</div>
+
+<script>
+// ════════════════════════════════════════════════
+//  CONFIGURATION — paste your Google Sheets URL
+// ════════════════════════════════════════════════
+// Step 1: Open your Google Sheet
+// Step 2: File → Share → Publish to web
+//         → Sheet1, CSV format → Publish
+// Step 3: Copy that URL and paste it below
+
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyZGasLeArOVtR469EaMB-Yqq_Diw9t38Tf2wDjoc0sB0k8g2QjRoTrQMULuBU3iU_PJtin7noNEnY/pubhtml?gid=0&single=true";
+// Example:
+// "https://docs.google.com/spreadsheets/d/SHEET_ID/export?format=csv&gid=0"
+
+// ════════════════════════════════════════════════
+
+let allRows = [];
+
+async function loadData() {
+  document.getElementById('table-count').textContent = 'Refreshing…';
+
+  try {
+    const res  = await fetch(SHEET_CSV_URL + '&t=' + Date.now());
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    // Assumes header row: Timestamp, fb_name, phone, email  (Apps Script order)
+    // Skip header
+    allRows = rows.slice(1).filter(r => r.length >= 3 && r[0] !== '');
+    allRows.reverse(); // newest first
+
+    updateStats(allRows);
+    renderTable(allRows);
+  } catch (err) {
+    console.error(err);
+    document.getElementById('table-body').innerHTML =
+      '<tr class="state-row"><td colspan="5">⚠️ Could not load data. Check your Sheet CSV URL.</td></tr>';
+    document.getElementById('table-count').textContent = 'Error';
+  }
+}
+
+function parseCSV(text) {
+  return text.trim().split('\n').map(line => {
+    const result = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    result.push(cur.trim());
+    return result;
+  });
+}
+
+function updateStats(rows) {
+  const today = new Date().toDateString();
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+  let todayCount = 0, weekCount = 0;
+  rows.forEach(r => {
+    const ts = new Date(r[0]);
+    if (ts.toDateString() === today) todayCount++;
+    if (ts >= weekAgo) weekCount++;
+  });
+
+  document.getElementById('stat-total').textContent = rows.length;
+  document.getElementById('stat-today').textContent = todayCount;
+  document.getElementById('stat-week').textContent  = weekCount;
+}
+
+function renderTable(rows) {
+  const tbody = document.getElementById('table-body');
+  document.getElementById('table-count').textContent = rows.length + ' record' + (rows.length !== 1 ? 's' : '');
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr class="state-row"><td colspan="5">No registrations yet.</td></tr>';
+    return;
+  }
+
+  // Column order from Apps Script: Timestamp | fb_name | username | phone | email
+  tbody.innerHTML = rows.map((r, i) => {
+    const ts       = r[0] ? new Date(r[0]).toLocaleString() : '—';
+    const fbName   = r[1] || '—';
+    const username = r[2] || '—';
+    const phone    = r[3] || '—';
+    const email    = r[4] || '—';
+    return `<tr>
+      <td class="td-num">${i + 1}</td>
+      <td class="td-fb">${esc(fbName)}</td>
+      <td>${esc(username)}</td>
+      <td class="td-phone">${esc(phone)}</td>
+      <td class="td-email">${esc(email)}</td>
+      <td class="td-date">${esc(ts)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// SEARCH
+document.getElementById('search-input').addEventListener('input', function () {
+  const q = this.value.trim().toLowerCase();
+  if (!q) { renderTable(allRows); return; }
+  const filtered = allRows.filter(r =>
+    r.some(cell => cell.toLowerCase().includes(q))
+  );
+  renderTable(filtered);
+});
+
+// EXPORT
+function exportCSV() {
+  if (!allRows.length) return alert('No data to export.');
+  const header = 'Timestamp,Facebook Name,Username,Phone,Email';
+  const csv = [header, ...allRows.map(r => r.map(c => `"${c}"`).join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'swc-signups-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// AUTO-REFRESH every 60 seconds
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>

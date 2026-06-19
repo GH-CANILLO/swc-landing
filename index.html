@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SWC V1 – User Sign Up</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0d0d0d;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(200,30,40,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* LOGO */
+    .logo-area { margin-bottom: 10px; }
+    .logo-img {
+      width: 140px; height: auto;
+      filter: drop-shadow(0 0 18px rgba(200,30,40,0.55));
+    }
+
+    /* TITLE */
+    .site-title {
+      font-size: 2.1rem; font-weight: 800; color: #fff;
+      letter-spacing: 0.04em; text-align: center; text-transform: uppercase;
+    }
+    .site-subtitle {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.22em;
+      color: #9ca3af; text-align: center; text-transform: uppercase;
+      margin-top: 2px; margin-bottom: 18px;
+    }
+
+    /* VIDEO AREA */
+    .video-area {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 18px;
+      border: 1px solid #2a2a2a;
+      background: #000;
+      box-shadow: 0 0 24px rgba(200,30,40,0.25);
+      position: relative;
+    }
+    .promo-video {
+      width: 100%;
+      display: block;
+      max-height: 220px;
+      object-fit: cover;
+    }
+    .video-label {
+      position: absolute;
+      top: 10px; left: 10px;
+      background: rgba(200,30,40,0.85);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .video-fallback {
+      display: none;
+      padding: 18px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.8rem;
+    }
+
+    /* CARD */
+    .card {
+      width: 100%;
+      background: #181818;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      background: #1e1e1e;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .card-header-icon {
+      width: 26px; height: 26px;
+      background: #c8202a; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; color: #fff; flex-shrink: 0;
+    }
+    .card-header-text {
+      font-size: 0.85rem; font-weight: 700; color: #fff;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+
+    /* VALIDATED BANNER */
+    .validated-banner {
+      display: flex; align-items: center; gap: 10px;
+      margin: 18px 18px 6px;
+      background: rgba(30,60,80,0.7);
+      border: 1px solid #1e4060;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .validated-icon {
+      width: 22px; height: 22px;
+      background: #1d7adc; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; color: #fff; flex-shrink: 0;
+    }
+    .validated-text { font-size: 0.82rem; font-weight: 600; color: #4db8ff; }
+
+    /* FORM */
+    .form-body {
+      padding: 14px 18px 20px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .input-group { display: flex; flex-direction: column; gap: 0; }
+    .input-wrap { position: relative; }
+    .input-field {
+      width: 100%;
+      background: #111;
+      border: 1.5px solid #2e2e2e;
+      border-radius: 6px;
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field::placeholder { color: #4b5563; }
+    .input-field:focus { border-color: #c8202a; }
+    .input-error {
+      font-size: 0.72rem; color: #ef4444;
+      margin-top: 4px; display: none; padding-left: 2px;
+    }
+    .input-error.visible { display: block; }
+
+    /* PHONE ROW */
+    .phone-row { display: flex; gap: 8px; }
+    .country-select-wrap {
+      display: flex; align-items: center; gap: 6px;
+      background: #111; border: 1.5px solid #2e2e2e;
+      border-radius: 6px; padding: 0 10px;
+      min-width: 82px; flex-shrink: 0;
+    }
+    .country-select-wrap:focus-within { border-color: #c8202a; }
+    .flag-emoji { font-size: 1.1rem; }
+    .country-select {
+      background: transparent; border: none;
+      color: #e5e7eb; font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; outline: none; cursor: pointer; width: 100%;
+    }
+    .country-select option { background: #1a1a1a; }
+    .phone-input-wrap { flex: 1; }
+
+    /* SUBMIT */
+    .btn-submit {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #7a7a7a 0%, #555 100%);
+      border: none; border-radius: 6px;
+      color: #fff; font-family: 'Inter', sans-serif;
+      font-size: 0.85rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: not-allowed; opacity: 0.6;
+      transition: all 0.25s; text-decoration: none; margin-top: 4px;
+    }
+    .btn-submit.active {
+      background: linear-gradient(135deg, #e8283a 0%, #a81020 100%);
+      cursor: pointer; opacity: 1;
+      box-shadow: 0 0 18px rgba(200,30,40,0.45);
+      animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+      0%,100% { box-shadow: 0 0 18px rgba(200,30,40,0.45); }
+      50%      { box-shadow: 0 0 30px rgba(200,30,40,0.7); }
+    }
+
+    /* DISCLAIMER */
+    .disclaimer {
+      text-align: center; font-size: 0.72rem;
+      color: #6b7280; line-height: 1.55;
+      margin-top: 18px; padding: 0 6px;
+    }
+
+    /* SUCCESS POPUP */
+    #success-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.78);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    #success-modal {
+      background: #1a1a1a; border: 1px solid #2e2e2e;
+      border-radius: 12px; max-width: 360px; width: 100%;
+      padding: 36px 28px 28px; text-align: center;
+      box-shadow: 0 0 50px rgba(200,30,40,0.3);
+      animation: pop-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes pop-in {
+      from { transform: scale(0.82); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    #success-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, #e8283a, #a81020);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; color: #fff;
+      margin: 0 auto 20px;
+      box-shadow: 0 0 24px rgba(200,30,40,0.5);
+    }
+    #success-title { font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+    #success-msg { font-size: 0.82rem; color: #9ca3af; line-height: 1.6; margin-bottom: 24px; }
+    #success-next-btn {
+      width: 100%; padding: 13px;
+      background: linear-gradient(135deg, #e8283a 0%, #a81020 100%);
+      border: none; border-radius: 6px; color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 0.88rem;
+      font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 0 18px rgba(200,30,40,0.4); transition: opacity 0.2s;
+    }
+    #success-next-btn:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- LOGO -->
+  <div class="logo-area">
+    <img src="https://i.imgur.com/3cmYibA.png" alt="SWC Casino Logo" class="logo-img">
+  </div>
+
+  <h1 class="site-title">SWC V1</h1>
+  <p class="site-subtitle">Online Gaming Portal</p>
+
+  <!-- PROMO VIDEO -->
+  <div class="video-area">
+    <span class="video-label">🎬 Now Playing</span>
+    <!--
+      IMPORTANT: Imgur does NOT support video hosting for direct playback.
+      Use one of these free alternatives instead:
+        • Cloudinary (free tier) → upload .mp4, get direct link
+        • Streamable.com        → upload video, get .mp4 direct URL
+        • GitHub raw file       → upload ≤25MB .mp4, use raw.githubusercontent.com URL
+        • Bunny.net CDN (free)  → best quality
+
+      Replace the src below with your actual .mp4 URL:
+    -->
+    <video class="promo-video" autoplay muted loop playsinline
+           poster="https://i.imgur.com/3cmYibA.png"
+           onerror="this.style.display='none';document.querySelector('.video-fallback').style.display='block'">
+      <source src="YOUR_VIDEO_URL_HERE.mp4" type="video/mp4">
+    </video>
+    <div class="video-fallback">📹 Promo video loading…</div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-icon">👤</div>
+      <span class="card-header-text">User Sign Up</span>
+    </div>
+    <div class="validated-banner">
+      <div class="validated-icon">✓</div>
+      <span class="validated-text">Referral Code Validated. You can now register.</span>
+    </div>
+    <div class="form-body">
+
+      <!-- Facebook Name -->
+      <div class="input-group">
+        <div class="input-wrap">
+          <input id="in-fb" type="text" name="fb_name" placeholder="Facebook Name" class="input-field">
+        </div>
+        <span id="er-fb" class="input-error">Facebook name is required</span>
+      </div>
+
+      <!-- Username -->
+      <div class="input-group">
+        <div class="input-wrap">
+          <input id="in-un" type="text" name="username" placeholder="Username" class="input-field" autocomplete="username">
+        </div>
+        <span id="er-un" class="input-error">Username is required</span>
+      </div>
+
+      <!-- Phone -->
+      <div class="input-group">
+        <div class="phone-row">
+          <div class="country-select-wrap">
+            <span class="flag-emoji">🇵🇭</span>
+            <select name="phone_country" aria-label="Country Code" class="country-select">
+              <option value="+63" selected>+63</option>
+              <option value="+1">+1</option>
+              <option value="+44">+44</option>
+              <option value="+61">+61</option>
+              <option value="+81">+81</option>
+              <option value="+82">+82</option>
+              <option value="+86">+86</option>
+              <option value="+91">+91</option>
+              <option value="+65">+65</option>
+              <option value="+60">+60</option>
+              <option value="+66">+66</option>
+            </select>
+          </div>
+          <div class="input-wrap phone-input-wrap">
+            <input id="in-ph" type="tel" name="phone" placeholder="Contact Number" class="input-field" maxlength="11">
+          </div>
+        </div>
+        <span id="er-ph" class="input-error">Contact number is required</span>
+      </div>
+
+      <!-- Email -->
+      <div class="input-group">
+        <div class="input-wrap">
+          <input id="in-em" type="email" name="email" placeholder="Email" class="input-field">
+        </div>
+        <span id="er-em" class="input-error">Please enter a valid email address</span>
+      </div>
+
+      <a id="btn-submit" href="#" role="button" class="btn-submit">
+        <span>✏️</span>
+        <span id="btn-text">Sign Up</span>
+      </a>
+    </div>
+  </div>
+
+  <p class="disclaimer">
+    Please ensure you are playing from a jurisdiction where online gaming is legal and regulated.<br><br>
+    Gaming is strictly for individuals aged 21 and above. Play responsibly and stay in control.
+  </p>
+</div>
+
+<!-- SUCCESS POPUP -->
+<div id="success-overlay">
+  <div id="success-modal">
+    <div id="success-icon">✓</div>
+    <h2 id="success-title">Registration Successful!</h2>
+    <p id="success-msg">Your information has been received. Click <strong>Next</strong> below and <strong style="color:#e8283a;letter-spacing:0.02em;">MESSAGE THE AGENT</strong> to <strong style="color:#e8283a;letter-spacing:0.02em;">APPROVE</strong> your registration.</p>
+    <button id="success-next-btn">Next &nbsp;→</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  const fbInput    = document.getElementById('in-fb');
+  const unInput    = document.getElementById('in-un');
+  const phoneInput = document.getElementById('in-ph');
+  const emailInput = document.getElementById('in-em');
+  const submitBtn  = document.getElementById('btn-submit');
+  const btnText    = document.getElementById('btn-text');
+  const overlay    = document.getElementById('success-overlay');
+  const nextBtn    = document.getElementById('success-next-btn');
+
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  function validateForm() {
+    const ok = fbInput.value.trim() !== '' &&
+               unInput.value.trim() !== '' &&
+               phoneInput.value.trim() !== '' &&
+               isValidEmail(emailInput.value.trim());
+    submitBtn.classList.toggle('active', ok);
+  }
+
+  [fbInput, unInput, phoneInput, emailInput].forEach(el => el.addEventListener('input', validateForm));
+
+  submitBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (!submitBtn.classList.contains('active')) return;
+
+    btnText.textContent = 'Submitting…';
+    submitBtn.style.pointerEvents = 'none';
+    submitBtn.style.animation = 'none';
+
+    const formData = new URLSearchParams();
+    formData.append('fb_name',  fbInput.value.trim());
+    formData.append('username', unInput.value.trim());
+    formData.append('phone',    phoneInput.value.trim());
+    formData.append('email',    emailInput.value.trim());
+
+    // ← YOUR GOOGLE APPS SCRIPT URL (same as before)
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYqSOrq4bT3gOuheZcBMG3Q5RR1GkFRDpXkvP92XfgPqhrug0qkwQueZRvJ-Vs3jQVIg/exec";
+
+    fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData })
+    .then(function () {
+      overlay.style.display = 'flex';
+      btnText.textContent = 'Sign Up';
+      submitBtn.style.pointerEvents = 'auto';
+      submitBtn.classList.remove('active');
+      submitBtn.style.animation = '';
+      fbInput.value = ''; unInput.value = ''; phoneInput.value = ''; emailInput.value = '';
+    })
+    .catch(function (err) {
+      console.error(err);
+      btnText.textContent = 'Error – Try Again';
+      submitBtn.style.pointerEvents = 'auto';
+    });
+  });
+
+  nextBtn.addEventListener('click', function () {
+    overlay.style.display = 'none';
+    window.location.href = 'https://www.facebook.com/winfordclay.walton';
+  });
+
+  overlay.addEventListener('click', function (e) {
+    if (e.target === overlay) overlay.style.display = 'none';
+  });
+})();
+</script>
+</body>
+</html>
